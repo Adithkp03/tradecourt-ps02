@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.replay_started
+data_cache/
+paper_account.db
+state.json
+journal.md
+news_snapshot.json
+data_provenance.json
