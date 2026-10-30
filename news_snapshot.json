@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-30 22:34:24",
+ "fetched_at": "2026-10-30 22:36:15",
  "data": {
   "RELIANCE.NS": {
    "headlines": [
@@ -92,24 +92,20 @@
   },
   "HDFCBANK.NS": {
    "headlines": [
+    "HDFC Bank Limited (HDB) Stock Price, News, Quote & History - Yahoo! Finance Canada",
     "HDFC Banks shares drifts lower as week ends - BusinessLine",
     "SENSEX rises over 300 points, NIFTY50 reclaims 23,000 led by Infosys, HDFC Bank - Upstox",
-    "HDFC Bank Stock Falls 2%, Yes Bank Shares Up 2% : Should You Buy Either Private Bank Stocks After Q2? - Goodreturns",
     "HDFC Bank shares fall 2% after Q2 results. What are Jefferies, Motilal Oswal analysts saying? - The Economic Times",
     "HDFC Bank stock: Brokerages stay bullish despite target price cuts after Q2 results; Bernstein sees 58%... - Moneycontrol.com",
-    "HDFC Bank Q2 profit rises 5%, net interest income grows - Yahoo Finance",
-    "India's HDFC Bank falls as investors weigh impact of outsider CEO pick - Reuters",
-    "HDFC Bank shares recover from fresh 52-week low as buyers step in - BusinessLine"
+    "HDFC Bank shares recover from fresh 52-week low as buyers step in - BusinessLine",
+    "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
+    "HDFC Bank: Why the stock can\u2019t catch a break Just ~5% return for investors in 5 years, versus nearly 55% for the Nifty. Profits are still growing, but slower. NIMs and return ratios have fallen, CASA has weakened, governance overhangs persist and ICICI Bank - LinkedIn"
    ],
-   "score": -1,
+   "score": 0,
    "hits": [
     [
      "SENSEX rises over 300 points, NIFTY50 reclaims 23,000 led by Infosys, HDFC Bank - Upstox",
      1
-    ],
-    [
-     "HDFC Bank Stock Falls 2%, Yes Bank Shares Up 2% : Should You Buy Either Private Bank Stocks After Q2? - Goodreturns",
-     -1
     ],
     [
      "HDFC Bank shares fall 2% after Q2 results. What are Jefferies, Motilal Oswal analysts saying? - The Economic Times",
@@ -120,12 +116,8 @@
      -1
     ],
     [
-     "HDFC Bank Q2 profit rises 5%, net interest income grows - Yahoo Finance",
-     2
-    ],
-    [
-     "India's HDFC Bank falls as investors weigh impact of outsider CEO pick - Reuters",
-     -1
+     "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
+     1
     ]
    ]
   },

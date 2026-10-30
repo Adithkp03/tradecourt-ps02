@@ -6,7 +6,7 @@ JOURNAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "journa
 
 def reset_journal(starting_cash):
     with open(JOURNAL, "w") as f:
-        f.write("# Aegis trade journal (SIMULATED / paper trading only)\n\n")
+        f.write("# TradeCourt journal (SIMULATED / paper trading only)\n\n")
         f.write(f"Starting paper capital: Rs{starting_cash:,.0f}. Every entry below was written "
                 "by the agent at the moment it traded.\n\n---\n")
 

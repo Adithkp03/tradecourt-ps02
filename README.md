@@ -1,4 +1,4 @@
-# Aegis - Agentic Paper-Trading Bot (AgentX PS-02)
+# TradeCourt - Agentic Paper-Trading Bot (AgentX PS-02)
 
 **SIMULATED / PAPER TRADING ONLY. No real money, no broker connection, no investment advice.**
 
