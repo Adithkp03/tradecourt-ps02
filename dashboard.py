@@ -34,7 +34,7 @@ st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. Startin
 st.caption("Historical-price replay with a current-news overlay. Judge-injected scenarios (crash / fake hype / broker failure) are synthetic test inputs, clearly logged as such.")
 
 stt = state()
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4, c5, c6 = st.columns(6)
 if c1.button("🛑 KILL SWITCH " + ("ON - release" if stt.get("kill") else "off - engage")):
     set_state(kill=not stt.get("kill")); st.rerun()
 if c2.button("🧹 LIQUIDATE ALL"):
@@ -45,6 +45,8 @@ if c4.button("📰 Inject fake hype news"):
     set_state(scenario={"type": "fake_hype", "symbol": "RELIANCE.NS"}); st.rerun()
 if c5.button("🔌 Inject broker failure"):
     set_state(scenario={"type": "broker_down"}); st.rerun()
+if c6.button("🗞 Duplicate headline 20x"):
+    set_state(scenario={"type": "dup_hype"}); st.rerun()
 if stt.get("kill"):
     st.warning("Kill switch ON - new trades blocked; stop-losses and exits keep running.")
 

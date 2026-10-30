@@ -13,17 +13,18 @@ Built for the AgentX Hackathon 2026 PS-02 by Team Vanquishers.
 
 | Requirement | Where |
 |---|---|
-| Reads market data | `aegis/data.py` - Yahoo Finance EOD (NSE), cached, synthetic fallback labelled |
-| Reads news | `aegis/news.py` - Google News RSS, transparent keyword sentiment, raw headlines shown |
-| Picks / adapts strategy | `aegis/strategy.py` - regime switch: momentum (SMA 20/50) when trending, mean reversion (RSI-14) when ranging; strong negative news blocks entries |
-| Backtests | `aegis/strategy.py::backtest` + `backtest_report.py` - same rules as live, vs buy-and-hold |
-| Simulated execution | `aegis/broker.py` - mock exchange, SQLite ledger, 0.1% cost model |
-| Position sizing | `aegis/risk.py` - 1% equity risk per trade via 2x ATR stop distance, max 20% notional, max 5 positions |
+| Reads market data | `tradecourt/data.py` - Yahoo Finance EOD (NSE), cached, synthetic fallback labelled |
+| Reads news | `tradecourt/news.py` - Google News RSS, transparent keyword sentiment, raw headlines shown |
+| Picks / adapts strategy | `tradecourt/strategy.py` - regime switch: momentum (SMA 20/50) when trending, mean reversion (RSI-14) when ranging; strong negative news blocks entries |
+| Backtests | `tradecourt/strategy.py::backtest` + `backtest_report.py` - same rules as live, vs buy-and-hold |
+| Simulated execution | `tradecourt/broker.py` - mock exchange, SQLite ledger, 0.1% cost model |
+| Position sizing | `tradecourt/risk.py` - 1% equity risk per trade via 2x ATR stop distance, max 20% notional per position, max gross exposure 50% of equity, max 5 positions |
 | Stop-losses | Hard 2x ATR stop per position, checked on every bar, exits at the stop |
 | Daily loss limit | Halts all new trades for the day at -2% of day-start equity |
 | Plain-language journal | `journal.md` + dashboard - every trade explained: why, risk in rupees, news context, result |
 | Human kill switch | Dashboard button -> `state.json`; agent checks before every cycle. LIQUIDATE ALL closes everything at market |
 | Backtest vs buy-and-hold | `backtest_report.py` (per symbol) and the live equity curve vs NIFTY buy-and-hold on the dashboard |
+| Judge challenge buttons | Dashboard: market crash, fake hype headline (marked `[INJECTED]`, NoiseShield blocks it), same headline 20x (unmarked - NoiseShield dedup counts it as one story, zero extra conviction), news blackout, broker failure. Each injection is logged and consumed exactly once |
 
 ## Quick start (Windows / macOS / Linux, CPU-only)
 
