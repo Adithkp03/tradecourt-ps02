@@ -2,13 +2,13 @@
 Decisions use only data available that day. Judge scenarios (crash / fake hype /
 broker failure) are injected live from the dashboard. SIMULATED throughout."""
 import argparse, time, json, os
-from aegis.data import load_history, SYMBOLS, INDEX
-from aegis.news import NewsDesk
-from aegis.broker import PaperBroker
-from aegis.risk import RiskManager, set_state
-from aegis import journal
-from aegis.strategy import add_indicators, backtest
-from aegis.agent import TradingAgent
+from tradecourt.data import load_history, SYMBOLS, INDEX
+from tradecourt.news import NewsDesk
+from tradecourt.broker import PaperBroker
+from tradecourt.risk import RiskManager, set_state
+from tradecourt import journal
+from tradecourt.strategy import add_indicators, backtest
+from tradecourt.agent import TradingAgent
 
 def main():
     ap = argparse.ArgumentParser()

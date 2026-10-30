@@ -2,7 +2,7 @@
 
 **SIMULATED / PAPER TRADING ONLY. No real money, no broker connection, no investment advice.**
 
-Aegis is an autonomous trading agent that reads market data and news, picks a strategy
+TradeCourt is an autonomous trading agent that reads market data and news, picks a strategy
 per stock based on the market regime, backtests it, and trades a simulated account on a
 mock exchange - with hard risk guardrails and a human kill switch, and a plain-language
 journal explaining every trade.

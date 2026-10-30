@@ -1,7 +1,7 @@
 """Backtest report: each symbol, same rules as the live agent, vs buy-and-hold."""
 import json
-from aegis.data import load_history, SYMBOLS, INDEX
-from aegis.strategy import backtest
+from tradecourt.data import load_history, SYMBOLS, INDEX
+from tradecourt.strategy import backtest
 
 rows = []
 for s in SYMBOLS + [INDEX]:
