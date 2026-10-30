@@ -10,12 +10,10 @@ from tradecourt import journal
 from tradecourt.strategy import add_indicators, backtest
 from tradecourt.agent import TradingAgent
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=120)
-    ap.add_argument("--delay", type=float, default=0.0)
-    ap.add_argument("--cash", type=float, default=1_000_000.0)
-    args = ap.parse_args()
+def run_replay(days=120, delay=0.0, cash=1_000_000.0):
+    class args:  # keeps the loop body below unchanged
+        pass
+    args.days, args.delay, args.cash = days, delay, cash
 
     print("=" * 66, flush=True)
     print(" TRADECOURT - every trade defended before it is placed | SIMULATED", flush=True)
@@ -75,6 +73,14 @@ def main():
         print(f"[done] agent Rs{f_:,.0f} ({f_/args.cash-1:+.1%}) vs buy-and-hold Rs{b_:,.0f} ({b_/args.cash-1:+.1%})"
               f" | {n} trades, {nd} court decisions", flush=True)
         print("[done] SIMULATED results - not investment advice.", flush=True)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--days", type=int, default=120)
+    ap.add_argument("--delay", type=float, default=0.0)
+    ap.add_argument("--cash", type=float, default=1_000_000.0)
+    a = ap.parse_args()
+    run_replay(days=a.days, delay=a.delay, cash=a.cash)
 
 if __name__ == "__main__":
     main()
