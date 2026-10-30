@@ -22,6 +22,9 @@ class PaperBroker:
              price REAL, cost REAL, strategy TEXT, reason TEXT, mode TEXT)""")
         c.execute("""CREATE TABLE IF NOT EXISTS equity_curve
             (ts TEXT PRIMARY KEY, equity REAL, cash REAL, benchmark REAL)""")
+        c.execute("""CREATE TABLE IF NOT EXISTS decisions
+            (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, symbol TEXT, proposal TEXT,
+             strategy TEXT, verdict TEXT, evidence TEXT, objections TEXT)""")
         c.execute("""CREATE TABLE IF NOT EXISTS events
             (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, kind TEXT, message TEXT)""")
         self.conn.commit()
@@ -30,7 +33,7 @@ class PaperBroker:
 
     def reset(self):
         c = self.conn.cursor()
-        for t in ("positions", "trades", "equity_curve", "events"):
+        for t in ("positions", "trades", "equity_curve", "events", "decisions"):
             c.execute(f"DELETE FROM {t}")
         self.set_meta("cash", str(self.starting_cash))
         self.set_meta("day_start_equity", str(self.starting_cash))
@@ -90,6 +93,11 @@ class PaperBroker:
         pnl = (price - pos["avg_price"]) * pos["qty"]
         self.log_event("trade", f"SELL {pos['qty']} {symbol} @ Rs{price:,.2f} | P&L Rs{pnl:+,.0f} - {reason}")
         return True
+
+    def record_decision(self, ts, symbol, proposal, strategy, verdict, evidence, objections):
+        self.conn.execute("INSERT INTO decisions (ts,symbol,proposal,strategy,verdict,evidence,objections) VALUES (?,?,?,?,?,?,?)",
+                          (ts, symbol, proposal, strategy, verdict, evidence, objections))
+        self.conn.commit()
 
     def record_equity(self, ts, prices, benchmark_value):
         eq = self.cash + sum(p["qty"] * prices.get(p["symbol"], p["avg_price"]) for p in self.positions())

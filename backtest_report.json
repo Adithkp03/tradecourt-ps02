@@ -1,0 +1,50 @@
+[
+ {
+  "symbol": "RELIANCE.NS",
+  "agent_return": "-1.3%",
+  "buy_hold_return": "-20.7%",
+  "max_drawdown": "1.4%",
+  "sharpe": -1.75,
+  "trades": 8
+ },
+ {
+  "symbol": "TCS.NS",
+  "agent_return": "-1.8%",
+  "buy_hold_return": "-18.6%",
+  "max_drawdown": "2.3%",
+  "sharpe": -1.02,
+  "trades": 11
+ },
+ {
+  "symbol": "INFY.NS",
+  "agent_return": "-2.4%",
+  "buy_hold_return": "-25.0%",
+  "max_drawdown": "3.3%",
+  "sharpe": -1.19,
+  "trades": 14
+ },
+ {
+  "symbol": "HDFCBANK.NS",
+  "agent_return": "-2.0%",
+  "buy_hold_return": "-25.0%",
+  "max_drawdown": "2.1%",
+  "sharpe": -1.48,
+  "trades": 6
+ },
+ {
+  "symbol": "ICICIBANK.NS",
+  "agent_return": "-0.4%",
+  "buy_hold_return": "+0.4%",
+  "max_drawdown": "1.2%",
+  "sharpe": -0.21,
+  "trades": 8
+ },
+ {
+  "symbol": "^NSEI",
+  "agent_return": "-2.2%",
+  "buy_hold_return": "-10.2%",
+  "max_drawdown": "2.3%",
+  "sharpe": -2.17,
+  "trades": 10
+ }
+]

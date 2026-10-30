@@ -1,13 +1,13 @@
-"""Replay the last N trading days through the agent against the paper account.
-Honest simulation: EOD data, decisions use only data available that day. All output
-is labelled SIMULATED. Use --delay to watch it trade live on the dashboard."""
-import argparse, time, sys
-import pandas as pd
+"""TradeCourt replay: N trading days through the agent vs the paper account.
+Decisions use only data available that day. Judge scenarios (crash / fake hype /
+broker failure) are injected live from the dashboard. SIMULATED throughout."""
+import argparse, time, json, os
 from aegis.data import load_history, SYMBOLS, INDEX
 from aegis.news import NewsDesk
 from aegis.broker import PaperBroker
 from aegis.risk import RiskManager, set_state
 from aegis import journal
+from aegis.strategy import add_indicators, backtest
 from aegis.agent import TradingAgent
 
 def main():
@@ -17,57 +17,64 @@ def main():
     ap.add_argument("--cash", type=float, default=1_000_000.0)
     args = ap.parse_args()
 
-    print("=" * 64, flush=True)
-    print(" AEGIS - agentic paper-trading bot  |  SIMULATED, NO REAL MONEY", flush=True)
-    print("=" * 64, flush=True)
-    print(f"[setup] downloading EOD data for {len(SYMBOLS)} NSE symbols + NIFTY...", flush=True)
-    hist = {s: load_history(s) for s in SYMBOLS}
+    print("=" * 66, flush=True)
+    print(" TRADECOURT - every trade defended before it is placed | SIMULATED", flush=True)
+    print("=" * 66, flush=True)
+    print(f"[setup] EOD data for {len(SYMBOLS)} NSE symbols + NIFTY...", flush=True)
+    hist = {s: add_indicators(load_history(s)) for s in SYMBOLS}
     bench = load_history(INDEX)
-    from aegis.strategy import add_indicators
-    hist = {s: add_indicators(df) for s, df in hist.items()}
-    sources = {s: df.attrs.get("source", "?") for s, df in hist.items()}
-    print(f"[setup] data source: {set(sources.values())}", flush=True)
 
-    set_state(kill=False, liquidate=False)
+    print("[setup] backtesting strategies (court needs the evidence)...", flush=True)
+    bts = {s: backtest(load_history(s)) for s in SYMBOLS}
+    for s, r in bts.items():
+        print(f"[backtest] {s:<14} agent {r['total_return']:+.1%} vs B&H {r['benchmark_return']:+.1%} "
+              f"| maxDD {r['max_drawdown']:.1%} | {r['n_trades']} trades", flush=True)
+
+    set_state(kill=False, liquidate=False, scenario=None)
     broker = PaperBroker(starting_cash=args.cash)
     broker.reset()
     journal.reset_journal(args.cash)
     news = NewsDesk()
-    print("[setup] fetching latest news headlines (Google News RSS, no key)...", flush=True)
+    print("[setup] fetching live news headlines (Google News RSS)...", flush=True)
     news.refresh(SYMBOLS)
+    json.dump({"fetched_at": news.fetched_at, "data": news.cache}, open("news_snapshot.json", "w"), indent=1)
     for s in SYMBOLS:
         st = news.sentiment(s)
-        print(f"[news] {s:<14} sentiment {st['score']:+d} from {len(st['headlines'])} headlines", flush=True)
+        print(f"[news] {s:<14} sentiment {st['score']:+d} ({len(st['headlines'])} headlines)", flush=True)
 
-    import json as _json
-    _json.dump({"fetched_at": news.fetched_at, "data": news.cache}, open("news_snapshot.json", "w"), indent=1)
-    agent = TradingAgent(broker, news, RiskManager(), SYMBOLS)
-    dates = bench.index[-args.days - 60:]  # extra warmup so indicators are valid on day 1
-    replay_dates = dates[-args.days:]
+    agent = TradingAgent(broker, news, RiskManager(), SYMBOLS, backtests=bts)
+    replay_dates = bench.index[-args.days:]
     bench0 = float(bench["Close"].loc[replay_dates[0]])
-    print(f"[run] replaying {len(replay_dates)} trading days, {replay_dates[0].date()} -> {replay_dates[-1].date()}", flush=True)
-    print(f"[run] paper capital Rs{args.cash:,.0f} | risk 1%/trade | stop 2xATR | daily loss limit 2% | kill switch armed", flush=True)
+    print(f"[run] {len(replay_dates)} trading days, {replay_dates[0].date()} -> {replay_dates[-1].date()}", flush=True)
+    print("[run] risk 1%/trade | stops 2xATR | daily loss limit -2% | kill switch armed | court in session", flush=True)
 
     for d in replay_dates:
-        windows = {s: hist[s].loc[:d] for s in SYMBOLS if d in hist[s].index}
+        windows = {s: hist[s].loc[:d].copy() for s in SYMBOLS if d in hist[s].index}
         if len(windows) < len(SYMBOLS):
             continue
+        scenario = None
+        try:
+            st = json.load(open("state.json"))
+            if st.get("scenario"):
+                scenario = st["scenario"]; set_state(scenario=None)
+        except Exception:
+            pass
         bv = args.cash * float(bench["Close"].loc[d]) / bench0
-        eq = agent.run_day(str(d.date()), windows, bv)
+        eq = agent.run_day(str(d.date()), windows, bv, scenario=scenario)
         if eq is not None:
-            n = len(broker.positions())
-            print(f"[{d.date()}] equity Rs{eq:>12,.0f} | bench Rs{bv:>12,.0f} | open {n}", flush=True)
+            print(f"[{d.date()}] equity Rs{eq:>12,.0f} | B&H Rs{bv:>12,.0f} | open {len(broker.positions())}", flush=True)
         if args.delay:
             time.sleep(args.delay)
 
-    eq = broker.conn.execute("SELECT equity,benchmark FROM equity_curve ORDER BY ts").fetchall()
-    if eq:
-        final, bfinal = eq[-1]["equity"], eq[-1]["benchmark"]
-        print("-" * 64, flush=True)
-        print(f"[done] agent Rs{final:,.0f} ({final/args.cash-1:+.1%}) vs buy-and-hold NIFTY "
-              f"Rs{bfinal:,.0f} ({bfinal/args.cash-1:+.1%}) | trades: "
-              f"{broker.conn.execute('SELECT COUNT(*) c FROM trades').fetchone()['c']}", flush=True)
-        print("[done] journal.md + dashboard updated. SIMULATED results - not investment advice.", flush=True)
+    rows = broker.conn.execute("SELECT equity,benchmark FROM equity_curve ORDER BY ts").fetchall()
+    if rows:
+        f_, b_ = rows[-1]["equity"], rows[-1]["benchmark"]
+        n = broker.conn.execute("SELECT COUNT(*) c FROM trades").fetchone()["c"]
+        nd = broker.conn.execute("SELECT COUNT(*) c FROM decisions").fetchone()["c"]
+        print("-" * 66, flush=True)
+        print(f"[done] agent Rs{f_:,.0f} ({f_/args.cash-1:+.1%}) vs buy-and-hold Rs{b_:,.0f} ({b_/args.cash-1:+.1%})"
+              f" | {n} trades, {nd} court decisions", flush=True)
+        print("[done] SIMULATED results - not investment advice.", flush=True)
 
 if __name__ == "__main__":
     main()

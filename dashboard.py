@@ -1,7 +1,7 @@
 import streamlit as st, sqlite3, json, os, time
 import pandas as pd, plotly.graph_objects as go
 
-st.set_page_config(page_title="Aegis - Paper Trading Agent", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="TradeCourt", page_icon="⚖️", layout="wide")
 BASE = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(BASE, "paper_account.db")
 
@@ -14,75 +14,87 @@ def state():
     try: return json.load(open(os.path.join(BASE, "state.json")))
     except Exception: return {}
 
-st.title("🛡️ Aegis - Agentic Paper-Trading Bot")
-st.error("SIMULATED / PAPER TRADING ONLY - no real money, no broker connection. EOD data: Yahoo Finance. Not investment advice.")
+def set_state(**kw):
+    stt = state(); stt.update(kw)
+    json.dump(stt, open(os.path.join(BASE, "state.json"), "w"))
+
+st.title("⚖️ TradeCourt - a paper trader that must defend every trade")
+st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. EOD data: Yahoo Finance. Not investment advice.")
 
 stt = state()
-k1, k2, k3 = st.columns([1, 1, 2])
-if k1.button("🛑 ENGAGE KILL SWITCH" if not stt.get("kill") else "✅ Kill switch ENGAGED - click to release"):
-    json.dump({**stt, "kill": not stt.get("kill")}, open(os.path.join(BASE, "state.json"), "w")); st.rerun()
-if k2.button("🧹 LIQUIDATE ALL POSITIONS"):
-    json.dump({**stt, "liquidate": True}, open(os.path.join(BASE, "state.json"), "w")); st.rerun()
+c1, c2, c3, c4, c5 = st.columns(5)
+if c1.button("🛑 KILL SWITCH " + ("ON - release" if stt.get("kill") else "off - engage")):
+    set_state(kill=not stt.get("kill")); st.rerun()
+if c2.button("🧹 LIQUIDATE ALL"):
+    set_state(liquidate=True); st.rerun()
+if c3.button("💥 Inject market crash"):
+    set_state(scenario={"type": "crash", "pct": -0.06}); st.rerun()
+if c4.button("📰 Inject fake hype news"):
+    set_state(scenario={"type": "fake_hype", "symbol": "RELIANCE.NS"}); st.rerun()
+if c5.button("🔌 Inject broker failure"):
+    set_state(scenario={"type": "broker_down"}); st.rerun()
 if stt.get("kill"):
-    k3.warning("Kill switch is ON - the agent checks it before every cycle and will not trade.")
+    st.warning("Kill switch ON - checked before every cycle; the agent will not trade.")
 
 eq = q("SELECT * FROM equity_curve ORDER BY ts")
 if eq:
     df = pd.DataFrame(eq)
     final, start = df["equity"].iloc[-1], df["equity"].iloc[0]
-    bh_final = df["benchmark"].iloc[-1]
     m1, m2, m3, m4, m5 = st.columns(5)
     m1.metric("Paper equity", f"Rs{final:,.0f}", f"{final/start-1:+.1%}")
-    m2.metric("Buy & hold (NIFTY)", f"Rs{bh_final:,.0f}", f"{bh_final/start-1:+.1%}")
+    m2.metric("Buy & hold NIFTY", f"Rs{df['benchmark'].iloc[-1]:,.0f}", f"{df['benchmark'].iloc[-1]/start-1:+.1%}")
     m3.metric("Cash", f"Rs{df['cash'].iloc[-1]:,.0f}")
     m4.metric("Max drawdown", f"{((df['equity'].cummax()-df['equity'])/df['equity'].cummax()).max():.1%}")
     m5.metric("Open positions", len(q("SELECT * FROM positions")))
     fig = go.Figure()
-    fig.add_scatter(x=df["ts"], y=df["equity"], name="Aegis agent", line=dict(color="#00c853", width=2))
+    fig.add_scatter(x=df["ts"], y=df["equity"], name="TradeCourt agent", line=dict(color="#00c853", width=2))
     fig.add_scatter(x=df["ts"], y=df["benchmark"], name="Buy & hold NIFTY", line=dict(color="#90a4ae", dash="dash"))
-    fig.update_layout(height=320, margin=dict(l=10, r=10, t=30, b=10), legend=dict(orientation="h"))
+    fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10), legend=dict(orientation="h"))
     st.plotly_chart(fig, use_container_width=True)
 
-left, right = st.columns(2)
+left, right = st.columns([3, 2])
 with left:
-    st.subheader("Open positions (with hard stops)")
+    st.subheader("🏛️ Decision room - every proposal, defended")
+    ds = q("SELECT * FROM decisions ORDER BY id DESC LIMIT 6")
+    for d in ds:
+        v = d["verdict"]
+        icon = {"APPROVED": "✅", "REJECTED": "❌", "HOLD": "⏸️"}.get(v, "•")
+        with st.expander(f"{icon} {d['ts']} - {d['symbol']}: {d['proposal']} -> **{v}**  ({d['strategy']})", expanded=(v != "HOLD")):
+            st.markdown("**Evidence**")
+            for e in json.loads(d["evidence"]): st.markdown(f"- {e}")
+            ob = json.loads(d["objections"])
+            if ob:
+                st.markdown("**Objections**")
+                for o in ob: st.markdown(f"- ⚠️ {o}")
+    st.subheader("Open positions (hard stops attached)")
     pos = q("SELECT * FROM positions")
     if pos:
         st.dataframe(pd.DataFrame(pos)[["symbol","qty","avg_price","stop_loss","opened"]], hide_index=True)
     else:
-        st.info("Flat - no open positions. The agent only trades when a strategy signals.")
-    st.subheader("Recent trades")
-    tr = q("SELECT ts,symbol,side,qty,price,strategy,reason FROM trades ORDER BY id DESC LIMIT 12")
-    st.dataframe(pd.DataFrame(tr), hide_index=True) if tr else st.info("None yet")
+        st.info("Flat - the agent only trades when a proposal survives court.")
 with right:
-    st.subheader("Agent activity log")
-    ev = q("SELECT ts,kind,message FROM events ORDER BY id DESC LIMIT 14")
-    for e in ev:
-        icon = {"trade": "💱", "guardrail": "🛡️", "system": "⚙️"}.get(e["kind"], "•")
+    st.subheader("Agent activity")
+    for e in q("SELECT ts,kind,message FROM events ORDER BY id DESC LIMIT 12"):
+        icon = {"trade": "💱", "guardrail": "🛡️", "system": "⚙️", "court": "⚖️", "scenario": "🧨"}.get(e["kind"], "•")
         st.caption(f"{icon} `{e['ts']}` {e['message']}")
-    st.subheader("Latest news sentiment snapshot")
+    st.subheader("News feed (NoiseShield input)")
     nj = os.path.join(BASE, "news_snapshot.json")
     if os.path.exists(nj):
         snap = json.load(open(nj))
-        st.caption(f"Fetched {snap.get('fetched_at')} - Google News RSS, keyword-scored, raw headlines below")
-        for sym, d in snap.get("data", {}).items():
-            with st.expander(f"{sym}  (score {d['score']:+d})"):
-                for h in d["headlines"][:5]: st.write("- " + h)
+        st.caption(f"Fetched {snap.get('fetched_at')} - keyword-scored, raw headlines")
+        for sym, d in list(snap.get("data", {}).items())[:3]:
+            with st.expander(f"{sym} ({d['score']:+d})"):
+                for h in d["headlines"][:4]: st.write("- " + h)
 
-st.subheader("Trade journal (plain language, written by the agent)")
+st.subheader("📖 Trade journal (plain language, written at trade time)")
 jp = os.path.join(BASE, "journal.md")
 if os.path.exists(jp):
-    txt = open(jp).read()
-    st.markdown(txt[-6000:])
+    st.markdown(open(jp).read()[-5000:])
 
-st.subheader("Backtest vs buy-and-hold (per symbol, full year)")
+st.subheader("🧪 Strategy lab - 1y backtest vs buy-and-hold")
 bt = os.path.join(BASE, "backtest_report.json")
 if os.path.exists(bt):
-    rows = json.load(open(bt))
-    st.dataframe(pd.DataFrame(rows), hide_index=True)
-else:
-    st.info("Run `python3 backtest_report.py` to generate.")
-
-st.caption("Aegis prototype for AgentX PS-02 - Team Vanquishers. Paper trading only.")
+    st.dataframe(pd.DataFrame(json.load(open(bt))), hide_index=True)
+st.caption("TradeCourt prototype - AgentX PS-02 - Team Vanquishers. Paper trading only.")
 time.sleep(2)
 st.rerun()
