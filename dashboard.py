@@ -34,18 +34,19 @@ st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. Startin
 st.caption("Historical-price replay with a current-news overlay. Judge-injected scenarios (crash / fake hype / broker failure) are synthetic test inputs, clearly logged as such.")
 
 stt = state()
-c1, c2, c3, c4, c5, c6 = st.columns(6)
-if c1.button("🛑 KILL SWITCH " + ("ON - release" if stt.get("kill") else "off - engage")):
+r1c1, r1c2, r1c3 = st.columns(3)
+r2c1, r2c2, r2c3 = st.columns(3)
+if r1c1.button("🛑 KILL SWITCH " + ("ON - release" if stt.get("kill") else "off - engage"), use_container_width=True):
     set_state(kill=not stt.get("kill")); st.rerun()
-if c2.button("🧹 LIQUIDATE ALL"):
+if r1c2.button("🧹 LIQUIDATE ALL", use_container_width=True):
     set_state(liquidate=True); st.rerun()
-if c3.button("💥 Inject market crash"):
+if r1c3.button("💥 Inject market crash", use_container_width=True):
     set_state(scenario={"type": "crash", "pct": -0.06}); st.rerun()
-if c4.button("📰 Inject fake hype news"):
+if r2c1.button("📰 Inject fake hype news", use_container_width=True):
     set_state(scenario={"type": "fake_hype", "symbol": "RELIANCE.NS"}); st.rerun()
-if c5.button("🔌 Inject broker failure"):
+if r2c2.button("🔌 Inject broker failure", use_container_width=True):
     set_state(scenario={"type": "broker_down"}); st.rerun()
-if c6.button("🗞 Duplicate headline 20x"):
+if r2c3.button("🗞 Duplicate headline 20x", use_container_width=True):
     set_state(scenario={"type": "dup_hype"}); st.rerun()
 if stt.get("kill"):
     st.warning("Kill switch ON - new trades blocked; stop-losses and exits keep running.")
