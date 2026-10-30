@@ -60,7 +60,7 @@ def backtest(df, starting_cash=1_000_000.0, risk_pct=0.01, max_pos_pct=0.20,
         row = df.iloc[i]
         price = float(row["Close"])
         if not started and not pd.isna(row["sma50"]):
-            bh_qty = starting_cash / price
+            bh_qty = (starting_cash * (1 - cost_bps / 1e4)) / price  # B&H pays the same buy cost
             started = True
         if pd.isna(row["sma50"]):
             equity_curve.append(starting_cash); continue

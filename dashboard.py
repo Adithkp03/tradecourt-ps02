@@ -6,9 +6,14 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(BASE, "paper_account.db")
 
 def q(sql, args=()):
-    conn = sqlite3.connect(DB); conn.row_factory = sqlite3.Row
-    try: return [dict(r) for r in conn.execute(sql, args)]
-    finally: conn.close()
+    for _ in range(5):
+        try:
+            conn = sqlite3.connect(DB, timeout=3); conn.row_factory = sqlite3.Row
+            try: return [dict(r) for r in conn.execute(sql, args)]
+            finally: conn.close()
+        except sqlite3.OperationalError:
+            time.sleep(0.3)
+    return []
 
 def state():
     try: return json.load(open(os.path.join(BASE, "state.json")))
@@ -19,7 +24,8 @@ def set_state(**kw):
     json.dump(stt, open(os.path.join(BASE, "state.json"), "w"))
 
 st.title("⚖️ TradeCourt - a paper trader that must defend every trade")
-st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. EOD data: Yahoo Finance. Not investment advice.")
+st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. Starting paper capital Rs10,00,000. EOD data: Yahoo Finance. Not investment advice.")
+st.caption("Historical-price replay with a current-news overlay. Judge-injected scenarios (crash / fake hype / broker failure) are synthetic test inputs, clearly logged as such.")
 
 stt = state()
 c1, c2, c3, c4, c5 = st.columns(5)
@@ -66,12 +72,12 @@ with left:
             if ob:
                 st.markdown("**Objections**")
                 for o in ob: st.markdown(f"- ⚠️ {o}")
-    st.subheader("Open positions (hard stops attached)")
     pos = q("SELECT * FROM positions")
+    st.subheader(f"Open positions ({len(pos)}) - hard stops attached")
     if pos:
         st.dataframe(pd.DataFrame(pos)[["symbol","qty","avg_price","stop_loss","opened"]], hide_index=True)
     else:
-        st.info("Flat - the agent only trades when a proposal survives court.")
+        st.info("No open positions right now - the agent only trades when a proposal survives court.")
 with right:
     st.subheader("Agent activity")
     for e in q("SELECT ts,kind,message FROM events ORDER BY id DESC LIMIT 12"):
@@ -81,7 +87,7 @@ with right:
     nj = os.path.join(BASE, "news_snapshot.json")
     if os.path.exists(nj):
         snap = json.load(open(nj))
-        st.caption(f"Fetched {snap.get('fetched_at')} - keyword-scored, raw headlines")
+        st.caption(f"CURRENT snapshot fetched {snap.get('fetched_at')} - demo overlay, not a historical news feed")
         for sym, d in list(snap.get("data", {}).items())[:3]:
             with st.expander(f"{sym} ({d['score']:+d})"):
                 for h in d["headlines"][:4]: st.write("- " + h)

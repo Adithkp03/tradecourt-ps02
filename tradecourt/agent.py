@@ -21,6 +21,28 @@ class TradingAgent:
             b.log_event("guardrail", "KILL SWITCH engaged - agent skipped this cycle entirely.")
             return None
         scenario = scenario or {}
+        applied = None
+        if scenario.get("type") == "fake_hype":
+            if not scenario.get("symbol"):
+                # Aim the judge's fake hype at a symbol whose setup is genuinely
+                # buy-eligible under positive sentiment - a real proposal, not staged.
+                for s in self.symbols:
+                    if s not in windows or b.position(s):
+                        continue
+                    if strategy.decide(windows[s].iloc[-1], 5, False)[0] == "buy":
+                        scenario["symbol"] = s
+                        break
+            if scenario.get("symbol") and not b.position(scenario["symbol"]):
+                applied = scenario
+            else:
+                b.log_event("scenario", "Judge's fake hype queued - waiting for a buy-eligible setup.")
+        else:
+            applied = scenario
+        if applied:
+            risk.set_state(scenario=None)  # exactly one injection per press
+            scenario = dict(applied)
+        else:
+            scenario = {}
         broker_down = scenario.get("type") == "broker_down"
         if risk.liquidate_requested():
             for p in b.positions():

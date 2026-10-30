@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-30 22:36:15",
+ "fetched_at": "2026-10-30 22:43:44",
  "data": {
   "RELIANCE.NS": {
    "headlines": [
@@ -32,26 +32,30 @@
    "headlines": [
     "TCS share price target: Nomura retains 'Buy' after management meet, says this - Business Today",
     "Tata Consultancy Services - TCS, Vedanta among 10 companies offering dividend yield of up to 7%. Do you own any? - The Economic Times",
-    "Tata Consultancy Services Limited (TCS.NS) stock price, news, quote and history - Yahoo Finance Australia",
     "TCS sees AI revenue growing 15-20% quarterly; Nomura retains 'Buy', target price at Rs 2,630 - Moneycontrol.com",
-    "Tata Consultancy Services (NSEI:TCS) Stock Price - Simply Wall St",
+    "TCS share price surges 28% in October, hits over 7-month high; here's why - Business Standard",
+    "India's TCS rises as margins steady despite AI investments - Reuters",
+    "Tata Consultancy Services slides Tuesday, underperforms competitors - MarketWatch",
     "Why is Tata Consultancy Services stock surging today? By Investing.com - Investing.com India",
-    "Stock Picks Today: Asian Paints, Trent, TCS, Suzlon Energy, And More On Brokerages' Radar - NDTV Profit",
-    "Why Is Stock Market Falling Today? 4 Key Reasons Behind Sensex, Nifty Crash - NDTV"
+    "TCS shares surge 4% post Q2 results; analysts split on outlook - BusinessLine"
    ],
-   "score": 1,
+   "score": 4,
    "hits": [
     [
      "Tata Consultancy Services - TCS, Vedanta among 10 companies offering dividend yield of up to 7%. Do you own any? - The Economic Times",
      1
     ],
     [
-     "Stock Picks Today: Asian Paints, Trent, TCS, Suzlon Energy, And More On Brokerages' Radar - NDTV Profit",
+     "TCS share price surges 28% in October, hits over 7-month high; here's why - Business Standard",
      1
     ],
     [
-     "Why Is Stock Market Falling Today? 4 Key Reasons Behind Sensex, Nifty Crash - NDTV",
-     -1
+     "India's TCS rises as margins steady despite AI investments - Reuters",
+     1
+    ],
+    [
+     "TCS shares surge 4% post Q2 results; analysts split on outlook - BusinessLine",
+     1
     ]
    ]
   },
@@ -92,20 +96,24 @@
   },
   "HDFCBANK.NS": {
    "headlines": [
-    "HDFC Bank Limited (HDB) Stock Price, News, Quote & History - Yahoo! Finance Canada",
     "HDFC Banks shares drifts lower as week ends - BusinessLine",
     "SENSEX rises over 300 points, NIFTY50 reclaims 23,000 led by Infosys, HDFC Bank - Upstox",
+    "HDFC Bank Stock Falls 2%, Yes Bank Shares Up 2% : Should You Buy Either Private Bank Stocks After Q2? - Goodreturns",
     "HDFC Bank shares fall 2% after Q2 results. What are Jefferies, Motilal Oswal analysts saying? - The Economic Times",
     "HDFC Bank stock: Brokerages stay bullish despite target price cuts after Q2 results; Bernstein sees 58%... - Moneycontrol.com",
-    "HDFC Bank shares recover from fresh 52-week low as buyers step in - BusinessLine",
-    "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
-    "HDFC Bank: Why the stock can\u2019t catch a break Just ~5% return for investors in 5 years, versus nearly 55% for the Nifty. Profits are still growing, but slower. NIMs and return ratios have fallen, CASA has weakened, governance overhangs persist and ICICI Bank - LinkedIn"
+    "HDFC Bank Q2 profit rises 5%, net interest income grows - Yahoo Finance",
+    "India's HDFC Bank falls as investors weigh impact of outsider CEO pick - Reuters",
+    "HDFC Bank shares recover from fresh 52-week low as buyers step in - BusinessLine"
    ],
-   "score": 0,
+   "score": -1,
    "hits": [
     [
      "SENSEX rises over 300 points, NIFTY50 reclaims 23,000 led by Infosys, HDFC Bank - Upstox",
      1
+    ],
+    [
+     "HDFC Bank Stock Falls 2%, Yes Bank Shares Up 2% : Should You Buy Either Private Bank Stocks After Q2? - Goodreturns",
+     -1
     ],
     [
      "HDFC Bank shares fall 2% after Q2 results. What are Jefferies, Motilal Oswal analysts saying? - The Economic Times",
@@ -116,24 +124,32 @@
      -1
     ],
     [
-     "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
-     1
+     "HDFC Bank Q2 profit rises 5%, net interest income grows - Yahoo Finance",
+     2
+    ],
+    [
+     "India's HDFC Bank falls as investors weigh impact of outsider CEO pick - Reuters",
+     -1
     ]
    ]
   },
   "ICICIBANK.NS": {
    "headlines": [
     "9 Stocks To Buy For Diwali 2026: Sharekhan Bullish on ICICI Bank, L&T, Airtel; up to 41.45% Upside - CNBC TV18",
-    "ICICI Bank Limited (IBN) Stock Price, News, Quote & History - Yahoo! Finance Canada",
-    "ICICI Bank Limited (ICICIBANK.NS) stock price, news, quote and history - Yahoo Finance UK",
     "How to Add Money to US Stocks on Groww with ICICI Bank: A Step-by-Step Guide - Groww",
+    "What Makes ICICI Bank (IBN) a New Strong Buy Stock - Yahoo Finance",
     "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
     "DLF, ICICI Bank among top stock picks for today; SBI Securities, Bonanza Portfolio recommend six buys - CNBC TV18",
     "ICICI Bank stock falls 1% after Q2 results, among top Nifty losers; brokerages bullish on growth,... - Moneycontrol.com",
-    "JPMorgan raises ICICI Bank stock price target on strong earnings - Investing.com"
+    "JPMorgan raises ICICI Bank stock price target on strong earnings - Investing.com",
+    "ICICI Bank Allots Shares Under Employee Stock Option Scheme - marketscreener.com"
    ],
-   "score": 2,
+   "score": 3,
    "hits": [
+    [
+     "What Makes ICICI Bank (IBN) a New Strong Buy Stock - Yahoo Finance",
+     1
+    ],
     [
      "Foreign Investors Own Half Of HDFC Bank and ICICI Bank. An LTCG Cut Could Matter Most Here - NDTV Profit",
      1

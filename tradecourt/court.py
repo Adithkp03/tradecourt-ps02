@@ -7,7 +7,7 @@ class NoiseShield:
     def __init__(self):
         self.seen = {}
     def check(self, symbol, headlines):
-        flags = []
+        hard, soft = [], []
         dup = 0
         for h in headlines:
             key = hashlib.md5(h.strip().lower().encode()).hexdigest()
@@ -15,14 +15,14 @@ class NoiseShield:
                 dup += 1
             self.seen[key] = self.seen.get(key, 0) + 1
         if dup:
-            flags.append(f"{dup} headline(s) are repeats of stories already counted - one story is not {dup+1} confirmations")
+            soft.append(f"{dup} headline(s) repeat stories already counted - repeats add zero conviction")
         if any("[INJECTED" in h for h in headlines):
-            flags.append("headline fails provenance check: source is unverified (no publisher, no timestamp chain)")
+            hard.append("headline fails provenance check: source unverified (no publisher, no timestamp chain)")
         if not headlines:
-            flags.append("no verifiable headlines at all - price data only")
-        return flags
+            soft.append("no verifiable headlines at all - price data only")
+        return hard, soft
 
-def deliberate(symbol, row, action, strat, reasons, sentiment, headlines, ns_flags,
+def deliberate(symbol, row, action, strat, reasons, sentiment, headlines, ns,
                day_pnl_pct, open_positions, max_positions, stop_dist, price, bt, broker_down):
     evidence = list(reasons)
     evidence.append(f"RSI {row['rsi']:.0f}, SMA20 {row['sma20']:.1f} vs SMA50 {row['sma50']:.1f}, ATR {row['atr']:.1f}")
@@ -30,7 +30,9 @@ def deliberate(symbol, row, action, strat, reasons, sentiment, headlines, ns_fla
         evidence.append(f"1y backtest of this strategy on {symbol}: {bt['total_return']:+.1%} vs buy-and-hold "
                         f"{bt['benchmark_return']:+.1%}, max drawdown {bt['max_drawdown']:.1%}, {bt['n_trades']} trades")
     evidence.append(f"news sentiment {sentiment:+d} across {len(headlines)} headlines")
-    objections = list(ns_flags)
+    ns_hard, ns_soft = ns
+    objections = list(ns_hard)
+    notes = list(ns_soft)
     if sentiment <= -3:
         objections.append(f"news sentiment strongly negative ({sentiment:+d}) - entries blocked by policy")
     if action == "buy" and row["rsi"] > 65:
@@ -50,4 +52,5 @@ def deliberate(symbol, row, action, strat, reasons, sentiment, headlines, ns_fla
     else:
         verdict = "APPROVED"
     return {"symbol": symbol, "proposal": action.upper(), "strategy": strat,
-            "evidence": evidence, "objections": objections, "verdict": verdict}
+            "evidence": evidence, "objections": objections + [f"note: {n}" for n in notes],
+            "verdict": verdict}

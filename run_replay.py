@@ -56,10 +56,10 @@ def main():
         try:
             st = json.load(open("state.json"))
             if st.get("scenario"):
-                scenario = st["scenario"]; set_state(scenario=None)
+                scenario = st["scenario"]  # agent consumes it when it can actually apply it
         except Exception:
             pass
-        bv = args.cash * float(bench["Close"].loc[d]) / bench0
+        bv = args.cash * (1 - 0.001) * float(bench["Close"].loc[d]) / bench0  # B&H pays same 0.1% buy cost
         eq = agent.run_day(str(d.date()), windows, bv, scenario=scenario)
         if eq is not None:
             print(f"[{d.date()}] equity Rs{eq:>12,.0f} | B&H Rs{bv:>12,.0f} | open {len(broker.positions())}", flush=True)
