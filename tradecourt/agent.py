@@ -17,9 +17,9 @@ class TradingAgent:
 
     def run_day(self, date_str, windows, bench_value, mode="replay", scenario=None):
         b = self.broker
-        if risk.kill_switch_engaged():
-            b.log_event("guardrail", "KILL SWITCH engaged - agent skipped this cycle entirely.")
-            return None
+        no_entries = risk.kill_switch_engaged()
+        if no_entries:
+            b.log_event("guardrail", "KILL SWITCH on - new entries blocked; stop-losses and exits stay protected.")
         scenario = scenario or {}
         applied = None
         if scenario.get("type") == "fake_hype":
@@ -108,6 +108,10 @@ class TradingAgent:
                            day_pnl_pct, len(b.positions()), self.risk.max_positions,
                            stop_dist, price, self.backtests.get(s), broker_down)
             interesting = action != "hold" or d["objections"] or scenario
+            if no_entries and action == "buy":
+                d["objections"].append("kill switch engaged by a human - new entries blocked")
+                d["verdict"] = "REJECTED"
+                interesting = True
             if interesting:
                 self._record(date_str, d)
                 b.log_event("court", f"{s}: proposal {d['proposal']} -> {d['verdict']}"
@@ -120,7 +124,7 @@ class TradingAgent:
                 b.sell(date_str, s, price, strat, reasons[0], mode)
                 journal.entry(date_str, "SELL", s, pos["qty"], price, pos["stop_loss"], equity,
                               strat, reasons, senti, self.news.fetched_at, pnl=pnl)
-            elif action == "buy" and not pos and not halted:
+            elif action == "buy" and not pos and not halted and not no_entries:
                 qty, stop = self.risk.size_position(equity, b.cash, price, float(row["atr"]))
                 if qty <= 0:
                     b.log_event("guardrail", f"Skipped {s}: risk sizing gave 0 shares (cash/equity limits).")

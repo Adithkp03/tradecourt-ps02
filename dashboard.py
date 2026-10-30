@@ -40,7 +40,7 @@ if c4.button("📰 Inject fake hype news"):
 if c5.button("🔌 Inject broker failure"):
     set_state(scenario={"type": "broker_down"}); st.rerun()
 if stt.get("kill"):
-    st.warning("Kill switch ON - checked before every cycle; the agent will not trade.")
+    st.warning("Kill switch ON - new trades blocked; stop-losses and exits keep running.")
 
 eq = q("SELECT * FROM equity_curve ORDER BY ts")
 if eq:
