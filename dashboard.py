@@ -24,7 +24,13 @@ def set_state(**kw):
     json.dump(stt, open(os.path.join(BASE, "state.json"), "w"))
 
 st.title("⚖️ TradeCourt - a paper trader that must defend every trade")
-st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. Starting paper capital Rs10,00,000. EOD data: Yahoo Finance. Not investment advice.")
+try:
+    _prov = json.load(open(os.path.join(BASE, "data_provenance.json")))
+    _srcs = set(_prov.values())
+    _dsrc = "Yahoo Finance EOD" if _srcs and all("Yahoo" in s for s in _srcs) else ("MIXED: " + "; ".join(f"{k}: {v}" for k, v in _prov.items()))
+except Exception:
+    _dsrc = "not loaded yet (replay starting)"
+st.error("SIMULATED / PAPER TRADING ONLY - mock exchange, no real money. Starting paper capital Rs10,00,000. Price data: " + _dsrc + ". Not investment advice.")
 st.caption("Historical-price replay with a current-news overlay. Judge-injected scenarios (crash / fake hype / broker failure) are synthetic test inputs, clearly logged as such.")
 
 stt = state()

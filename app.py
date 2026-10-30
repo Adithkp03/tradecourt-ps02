@@ -12,7 +12,7 @@ def _bootstrap():
         from run_replay import run_replay
         # delay keeps the agent "live" for several minutes so judges can use the
         # kill switch and scenario buttons while the replay is still running
-        run_replay(days=120, delay=2.0, cash=1_000_000.0)
+        run_replay(days=120, delay=float(os.environ.get("TRADECOURT_REPLAY_DELAY", "2.0")), cash=1_000_000.0)
     except Exception as e:  # surfaced in Cloud logs; dashboard stays up
         print(f"[bootstrap] replay thread ended with error: {e}", flush=True)
 

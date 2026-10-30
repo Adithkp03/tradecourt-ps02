@@ -21,6 +21,9 @@ def run_replay(days=120, delay=0.0, cash=1_000_000.0):
     print(f"[setup] EOD data for {len(SYMBOLS)} NSE symbols + NIFTY...", flush=True)
     hist = {s: add_indicators(load_history(s)) for s in SYMBOLS}
     bench = load_history(INDEX)
+    prov = {s: hist[s].attrs.get("source", "unknown") for s in SYMBOLS}
+    prov[INDEX] = bench.attrs.get("source", "unknown")
+    json.dump(prov, open("data_provenance.json", "w"), indent=1)
 
     print("[setup] backtesting strategies (court needs the evidence)...", flush=True)
     bts = {s: backtest(load_history(s)) for s in SYMBOLS}
