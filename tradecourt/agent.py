@@ -22,7 +22,7 @@ class TradingAgent:
             b.log_event("guardrail", "KILL SWITCH on - new entries blocked; stop-losses and exits stay protected.")
         scenario = scenario or {}
         applied = None
-        if scenario.get("type") == "fake_hype":
+        if scenario.get("type") in ("fake_hype", "dup_hype"):
             if not scenario.get("symbol"):
                 # Aim the judge's fake hype at a symbol whose setup is genuinely
                 # buy-eligible under positive sentiment - a real proposal, not staged.
@@ -87,6 +87,11 @@ class TradingAgent:
                 headlines = [f"[INJECTED by judge] {s} to double in a week, say insiders - act now!"] + headlines
                 senti = 5
                 b.log_event("scenario", f"JUDGE INJECTED misleading hype headline on {s} - NoiseShield must catch it.")
+            if scenario.get("type") == "dup_hype" and scenario.get("symbol") == s:
+                one = f"{s} beats estimates and raises guidance, say analysts"
+                headlines = [one] * 20 + headlines
+                senti = snap["score"] + 2  # one independent positive story - 20 copies add zero conviction
+                b.log_event("scenario", f"JUDGE INJECTED the same headline 20x on {s} - NoiseShield must count it as one story.")
             ns_flags = self.ns.check(s, headlines)
 
             if pos and float(row["Low"]) <= pos["stop_loss"]:
@@ -125,7 +130,8 @@ class TradingAgent:
                 journal.entry(date_str, "SELL", s, pos["qty"], price, pos["stop_loss"], equity,
                               strat, reasons, senti, self.news.fetched_at, pnl=pnl)
             elif action == "buy" and not pos and not halted and not no_entries:
-                qty, stop = self.risk.size_position(equity, b.cash, price, float(row["atr"]))
+                gross = sum(p["qty"] * prices.get(p["symbol"], p["avg_price"]) for p in b.positions())
+                qty, stop = self.risk.size_position(equity, b.cash, price, float(row["atr"]), gross)
                 if qty <= 0:
                     b.log_event("guardrail", f"Skipped {s}: risk sizing gave 0 shares (cash/equity limits).")
                     continue
